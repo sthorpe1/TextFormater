@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
+
 import javax.swing.JComponent; 
 import javax.swing.*;
 
@@ -106,8 +108,14 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		if(e.getActionCommand().equalsIgnoreCase("Open")) {
-			open();
+		if(e.getActionCommand().equalsIgnoreCase("Open File")) {
+			try {
+				open();
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 		} else if (e.getActionCommand().equalsIgnoreCase("Save")) {
 			save();
 		} else if (e.getActionCommand().equalsIgnoreCase("Save as")) {
@@ -117,7 +125,32 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		
 	}
 	
-	private void open() {
+	private void open() throws FileNotFoundException {
+		
+		JFileChooser fileChooser = new JFileChooser();
+		StringBuilder sb = new StringBuilder();
+		
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(this);
+		
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = fileChooser.getSelectedFile();
+		    
+				Scanner input = new Scanner(selectedFile);
+				text1.setText(selectedFile.getAbsolutePath());
+				while(input.hasNext()){
+					
+					sb.append(input.nextLine());
+					sb.append("\n");
+				}
+				input.close();
+			
+					
+		} else
+		{
+			sb.append("No file was selected");
+		}
+		
 		
 	}
 				
