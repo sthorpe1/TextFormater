@@ -18,6 +18,11 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
+	JPanel panelIn;
+	JPanel panelOut;
+	JTextArea text1;
+	JTextArea text2;
+	JSplitPane splitPane;
 	
 	public static void main(String[] args){
 		
@@ -34,9 +39,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	
 	public void createGUI() {
-		
-		JTextArea text = new JTextArea();
-		
+
 		JMenuBar bar = new JMenuBar();
 		JMenu file = new JMenu("File"); 
 		JMenuItem newItem = new JMenu("New");
@@ -57,10 +60,46 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		file.add(saveasFile);
 		bar.add(file);
 		
-		add(text);
-		
 		setJMenuBar(bar);
+	
+		//
+		text1 = new JTextArea();
+		text2 = new JTextArea();
+	
 		
+		panelIn = new JPanel();
+		panelIn.setBackground(Color.pink);
+		panelIn.add(text1);
+		panelOut = new JPanel();
+		panelOut.setBackground(Color.WHITE);
+		panelOut.add(text2);
+	 
+		//JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(panelIn), new JScrollPane(panelOut));
+
+		JScrollPane inputScrollPane = new JScrollPane(panelIn);
+		inputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		inputScrollPane.setPreferredSize(new Dimension(250,250));
+		inputScrollPane.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Input Text"), 
+				BorderFactory.createEmptyBorder(5,5,5,5)), inputScrollPane.getBorder()));
+		inputScrollPane.setMinimumSize(new Dimension(10,10));
+		
+		//
+		JScrollPane outputScrollPane = new JScrollPane(panelOut);
+		outputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		outputScrollPane.setPreferredSize(new Dimension(250,250));
+		outputScrollPane.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Output Text"), 
+				BorderFactory.createEmptyBorder(5,5,5,5)), outputScrollPane.getBorder()));
+		outputScrollPane.setMinimumSize(new Dimension(10,10));
+		
+		//
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inputScrollPane, outputScrollPane);
+		splitPane.setResizeWeight(0.5);
+		splitPane.setTopComponent(inputScrollPane);
+		splitPane.setBottomComponent(outputScrollPane);
+		
+		add(splitPane);
 	}
 
 
