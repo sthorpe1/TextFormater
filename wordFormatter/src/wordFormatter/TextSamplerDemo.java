@@ -96,7 +96,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		outputScrollPane.setMinimumSize(new Dimension(10,10));
 		
 		//
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inputScrollPane, outputScrollPane);
+		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, inputScrollPane, outputScrollPane);
 		splitPane.setResizeWeight(0.5);
 		splitPane.setTopComponent(inputScrollPane);
 		splitPane.setBottomComponent(outputScrollPane);
@@ -157,8 +157,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void saveasFile() {
 	
 	}	
-	public JTextArea getText(){
-		return text1;
+	
 		
-	}
+	
 }
