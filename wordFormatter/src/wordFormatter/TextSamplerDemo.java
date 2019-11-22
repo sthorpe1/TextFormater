@@ -109,13 +109,15 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getActionCommand().equalsIgnoreCase("Open File")) {
-			try {
+			//try {
 				open();
-			} catch (FileNotFoundException e1) {
+			//} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
+				//e1.printStackTrace();
+			//} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+						
 		} else if (e.getActionCommand().equalsIgnoreCase("Save")) {
 			save();
 		} else if (e.getActionCommand().equalsIgnoreCase("Save as")) {
@@ -124,33 +126,28 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 		
 	}
+
 	
-	private void open() throws FileNotFoundException {
+	private void open() {//throws IOException {
 		
 		JFileChooser fileChooser = new JFileChooser();
-		StringBuilder sb = new StringBuilder();
 		
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-		int result = fileChooser.showOpenDialog(this);
-		
-		if (result == JFileChooser.APPROVE_OPTION) {
-		    File selectedFile = fileChooser.getSelectedFile();
-		    
-				Scanner input = new Scanner(selectedFile);
-				text1.setText(selectedFile.getAbsolutePath());
-				while(input.hasNext()){
-					
-					sb.append(input.nextLine());
-					sb.append("\n");
-				}
-				input.close();
+		int result = fileChooser.showOpenDialog(null);
+		File selectedFile = fileChooser.getSelectedFile();
+		String filename = selectedFile.getAbsolutePath();
+		try{	    
+			BufferedReader br = new BufferedReader(new FileReader(filename));
 			
-					
-		} else
-		{
-			sb.append("No file was selected");
+			text1.read(br, null);
+			br.close();
+			text1.requestFocus();
+			
 		}
-		
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(null, e);
+		}
 		
 	}
 				
@@ -160,4 +157,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void saveasFile() {
 	
 	}	
+	public JTextArea getText(){
+		return text1;
+		
+	}
 }
