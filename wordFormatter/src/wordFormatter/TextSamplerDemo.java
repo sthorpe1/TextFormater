@@ -1,24 +1,27 @@
 package wordFormatter;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.event.*;
+import java.io.*;
 import java.util.Scanner;
-
-import javax.swing.JComponent; 
 import javax.swing.*;
 
 
 public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
+	
+	//These variables are set to the default values that the text formatter will have
+	//They will be changed by other methods and will be used later in the code
+	//to format the text
+	public int lineLength = 80;
+	public int alignment = 0; //0 = left, 1 = center, 2 = right
+	public boolean equalSpace = false;
+	public boolean wrap = false;
+	public int space = 0;//0 = single-spaced, 1 = double-spaced
+	public boolean title = false;
+	public int paragraphIndent = 0;
+	public int blankLines = 0;
+	public int columnNumber = 1;//this value can only be 1 or 2
 	
 	JPanel panelIn;
 	JPanel panelOut;
@@ -139,9 +142,9 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		try{	    
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			
-			text1.read(br, null);
+			text1.read(br, null);////////////////////////////////////////add switch case here
 			br.close();
-			text1.requestFocus();
+			text1.requestFocus();///////////////////////////////////////add how to use variables to change text formatting
 			
 		}
 		catch (Exception e)
@@ -157,7 +160,62 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void saveasFile() {
 	
 	}	
-	
-		
-	
+	//All functions below here change the variables that are declared above
+	public void changeLineLength(int newLength) //Error handling may still need to be added to these functions
+	{											//For example, column function will need to revert back to 1 if
+		lineLength = newLength;					//a column number that isn't 1 or 2 is inputed by user
+	}
+	public void changeAlignment(int newAlign)
+	{
+		alignment = newAlign;
+	}
+	public void toggleEqual()
+	{
+		if(equalSpace == false)
+		{
+			equalSpace = true;
+		}
+		else
+		{
+			equalSpace = false;
+		}
+	}
+	public void toggleWrap(String toggler)
+	{
+		if(toggler == "+")
+		{
+			wrap = true;
+		}
+		else
+		{
+			wrap = false;
+		}
+	}
+	public void changeSpace(int spacing)
+	{
+		space = spacing;
+	}
+	public void toggleTitle()
+	{
+		if(title == false)
+		{
+			title= true;
+		}
+		else
+		{
+			title = false;
+		}
+	}
+	public void changeParagraph(int indent)
+	{
+		paragraphIndent = indent;
+	}
+	public void changeBlankLines(int numberOfBlanks)
+	{
+		blankLines = numberOfBlanks;
+	}
+	public void changeColumns(int newColumnNumber)
+	{
+		columnNumber = newColumnNumber;
+	}
 }
