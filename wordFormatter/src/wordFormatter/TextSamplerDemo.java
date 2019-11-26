@@ -143,9 +143,10 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			
 			String currentLine; //current line that the buffered reader is looking at
-		      String command = "";
-		      String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
-					while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
+		    String command = "";
+		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
+		    int specifiedNum = 0;
+		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
 		      {
 		        if(currentLine.substring(0,1) == "-")//checks if line being read is a command
 		        {
@@ -154,28 +155,68 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		          switch(command) //Dictates based on command read which variables to change by calling functions to change variables
 		          {
 		           case("-n"): //number of characters in a line
+		        	   try{
+		        		   specifiedNum = Integer.parseInt(commandDetail);
+		        	   }
+		           		catch(NumberFormatException e)
+		           		{
+		           			specifiedNum = -1;
+		           		};
+		           		changeLineLength(specifiedNum);
 		             break;
-		           case("-r"): //aligns all text after the command to the right side
-		              break;
 		           case("-l"): //aligns all text after the command to the left side
+		        	   changeAlignment(0);
 		             break;
 		           case("-c"): //aligns all text after the command to the center
+		        	   changeAlignment(1);
+		             break;
+		           case("-r"): //aligns all text after the command to the right side
+		        	   changeAlignment(2);
 		             break;
 		           case("-e"): //equally spaces all words in the line
+		        	   toggleEqual();
 		             break;
 		           case("-w"): //toggles wrap
+		        	   toggleWrap(commandDetail);
 		             break;
 		           case("-s"): //single spacing
+		        	   changeSpace(0);
 		             break;
 		           case("-d"): //double spacing
+		        	   changeSpace(1);
 		             break;
 		           case("-t"): //text after this command becomes a title by printing the text on one line and then printing hyphens underneath the text on a second line
-		              break;
+		              toggleTitle();
+		        	   break;
 		           case("-p"): //adds indentation
+		        	   try{
+		        		   specifiedNum = Integer.parseInt(commandDetail);
+		        	   }
+		           		catch(NumberFormatException e)
+		           		{
+		           			specifiedNum = -1;
+		           		};
+		           		changeParagraph(specifiedNum);
 		             break;
 		           case("-b"): //adds new blank line
+		        	   try{
+		        		   specifiedNum = Integer.parseInt(commandDetail);
+		        	   }
+		           		catch(NumberFormatException e)
+		           		{
+		           			specifiedNum = -1;
+		           		};
+		           		changeBlankLines(specifiedNum);
 		             break;
 		           case("-a"): //changes amount of columns of text (similar to how a textbook may have their text formatted)
+		        	   try{
+		        		   specifiedNum = Integer.parseInt(commandDetail);
+		        	   }
+		           		catch(NumberFormatException e)
+		           		{
+		           			specifiedNum = -1;
+		           		};
+		           		changeColumns(specifiedNum);
 		             break;
 		          }
 		        }
@@ -202,9 +243,19 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	}	
 	//All functions below here change the variables that are declared above
-	public void changeLineLength(int newLength) //Error handling may still need to be added to these functions
-	{											//For example, column function will need to revert back to 1 if
-		lineLength = newLength;					//a column number that isn't 1 or 2 is inputed by user
+	//Error handling may still need to be added to these functions
+	//For example, column function will need to revert back to 1 if
+	//a column number that isn't 1 or 2 is inputed by user
+	public void changeLineLength(int newLength)
+	{
+		if(newLength == -1)
+		{
+			//error: input after "-n" command is not an integer
+		}
+		else
+		{
+			lineLength = newLength;
+		}
 	}
 	public void changeAlignment(int newAlign)
 	{
@@ -227,9 +278,13 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		{
 			wrap = true;
 		}
-		else
+		else if(toggler == "-")
 		{
 			wrap = false;
+		}
+		else
+		{
+			//error: input after "-w" is not a + or - symbol
 		}
 	}
 	public void changeSpace(int spacing)
@@ -240,7 +295,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	{
 		if(title == false)
 		{
-			title= true;
+			title = true;
 		}
 		else
 		{
@@ -249,14 +304,39 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	}
 	public void changeParagraph(int indent)
 	{
-		paragraphIndent = indent;
+		if(indent == -1)
+		{
+			//error: input after "-p" command is not an integer
+		}
+		else
+		{
+			paragraphIndent = indent;
+		}
 	}
 	public void changeBlankLines(int numberOfBlanks)
 	{
-		blankLines = numberOfBlanks;
+		if(numberOfBlanks == -1)
+		{
+			//error: input after "-b" command is not an integer
+		}
+		else
+		{
+			blankLines = numberOfBlanks;
+		}
 	}
 	public void changeColumns(int newColumnNumber)
 	{
-		columnNumber = newColumnNumber;
+		if(newColumnNumber == -1)
+		{
+			//error: input after "-a" command is not an integer
+		}
+		else if(newColumnNumber < 1 || newColumnNumber > 2)
+		{
+			//error: input after "-a" command is invalid you can only have 1 or 2 columns
+		}
+		else
+		{
+			columnNumber = newColumnNumber;
+		}
 	}
 }
