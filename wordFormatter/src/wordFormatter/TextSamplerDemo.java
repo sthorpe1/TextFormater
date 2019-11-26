@@ -142,9 +142,50 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		try{	    
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			
-			text1.read(br, null);////////////////////////////////////////add switch case here
+			String currentLine; //current line that the buffered reader is looking at
+		      String command = "";
+		      String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
+					while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
+		      {
+		        if(currentLine.substring(0,1) == "-")//checks if line being read is a command
+		        {
+		          command = currentLine.substring(0,2);
+		          commandDetail = currentLine.substring(2,currentLine.length());
+		          switch(command) //Dictates based on command read which variables to change by calling functions to change variables
+		          {
+		           case("-n"): //number of characters in a line
+		             break;
+		           case("-r"): //aligns all text after the command to the right side
+		              break;
+		           case("-l"): //aligns all text after the command to the left side
+		             break;
+		           case("-c"): //aligns all text after the command to the center
+		             break;
+		           case("-e"): //equally spaces all words in the line
+		             break;
+		           case("-w"): //toggles wrap
+		             break;
+		           case("-s"): //single spacing
+		             break;
+		           case("-d"): //double spacing
+		             break;
+		           case("-t"): //text after this command becomes a title by printing the text on one line and then printing hyphens underneath the text on a second line
+		              break;
+		           case("-p"): //adds indentation
+		             break;
+		           case("-b"): //adds new blank line
+		             break;
+		           case("-a"): //changes amount of columns of text (similar to how a textbook may have their text formatted)
+		             break;
+		          }
+		        }
+		        else //The only thing that isn't a command is text, any text on this line should be printed on the display after being formatted
+		        {
+		          //Put code to format and display the text in here, use variables to dictate how it should be formatted
+		        }
+		      }
 			br.close();
-			text1.requestFocus();///////////////////////////////////////add how to use variables to change text formatting
+			text1.requestFocus();
 			
 		}
 		catch (Exception e)
