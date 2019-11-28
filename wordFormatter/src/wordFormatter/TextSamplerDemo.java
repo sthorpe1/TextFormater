@@ -146,15 +146,19 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		    String command = "";
 		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
 		    int specifiedNum = 0;
+		    
 		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
 		      {
-		        if(currentLine.substring(0,1) == "-")//checks if line being read is a command
+		        if(currentLine.indexOf("-") == 0)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
 		          commandDetail = currentLine.substring(2,currentLine.length());
+		          
 		          switch(command) //Dictates based on command read which variables to change by calling functions to change variables
 		          {
-		           case("-n"): //number of characters in a line
+		          //Parses user input for numerical value to pass as a new line length, includes
+		          //error handling and will return -1 if the input is invalid.
+		           case("-n"): 
 		        	   try{
 		        		   specifiedNum = Integer.parseInt(commandDetail);
 		        	   }
@@ -164,30 +168,41 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           		};
 		           		changeLineLength(specifiedNum);
 		             break;
+		             
 		           case("-l"): //aligns all text after the command to the left side
 		        	   changeAlignment(0);
 		             break;
+		             
 		           case("-c"): //aligns all text after the command to the center
 		        	   changeAlignment(1);
 		             break;
+		             
 		           case("-r"): //aligns all text after the command to the right side
 		        	   changeAlignment(2);
 		             break;
+		             
 		           case("-e"): //equally spaces all words in the line
 		        	   toggleEqual();
 		             break;
+		             
 		           case("-w"): //toggles wrap
 		        	   toggleWrap(commandDetail);
 		             break;
+		             
 		           case("-s"): //single spacing
 		        	   changeSpace(0);
 		             break;
+		             
 		           case("-d"): //double spacing
 		        	   changeSpace(1);
 		             break;
+		             
 		           case("-t"): //text after this command becomes a title by printing the text on one line and then printing hyphens underneath the text on a second line
 		              toggleTitle();
 		        	   break;
+		        	   
+		           //Parses user input for numerical value to pass a number of spaces to indent, includes
+				   //error handling and will return -1 if the input is invalid.
 		           case("-p"): //adds indentation
 		        	   try{
 		        		   specifiedNum = Integer.parseInt(commandDetail);
@@ -198,6 +213,9 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           		};
 		           		changeParagraph(specifiedNum);
 		             break;
+		             
+		           //Parses user input for numerical value to pass a number of blank lines to add, includes
+				   //error handling and will return -1 if the input is invalid.
 		           case("-b"): //adds new blank line
 		        	   try{
 		        		   specifiedNum = Integer.parseInt(commandDetail);
@@ -208,6 +226,9 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           		};
 		           		changeBlankLines(specifiedNum);
 		             break;
+		             
+		           //Parses user input for numerical value to pass a number of columns, includes
+				   //error handling and will return -1 if the input is invalid.
 		           case("-a"): //changes amount of columns of text (similar to how a textbook may have their text formatted)
 		        	   try{
 		        		   specifiedNum = Integer.parseInt(commandDetail);
@@ -218,6 +239,9 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           		};
 		           		changeColumns(specifiedNum);
 		             break;
+		             
+		           default:
+		        	   recordErrors("Error: Input after '-' is not a valid command.");
 		          }
 		        }
 		        else //The only thing that isn't a command is text, any text on this line should be printed on the display after being formatted
@@ -242,25 +266,32 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void saveasFile() {
 	
 	}	
+	
+	//Displays errors to the GUI for user to read
+	public void recordErrors(String errorMsg) {
+		text2.append(errorMsg); 
+		//There's no area for displaying errors right now, so I'm printing to 2nd area text box for now.
+	}
+	
 	//All functions below here change the variables that are declared above
-	//Error handling may still need to be added to these functions
-	//For example, column function will need to revert back to 1 if
-	//a column number that isn't 1 or 2 is inputed by user
+	//These functions also feature with error handling
 	public void changeLineLength(int newLength)
 	{
 		if(newLength == -1)
 		{
-			//error: input after "-n" command is not an integer
+			recordErrors("Error: Input after '-n' command is not an integer.");
 		}
 		else
 		{
 			lineLength = newLength;
 		}
 	}
+	
 	public void changeAlignment(int newAlign)
 	{
 		alignment = newAlign;
 	}
+	
 	public void toggleEqual()
 	{
 		if(equalSpace == false)
@@ -272,6 +303,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			equalSpace = false;
 		}
 	}
+	
 	public void toggleWrap(String toggler)
 	{
 		if(toggler == "+")
@@ -284,13 +316,15 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		}
 		else
 		{
-			//error: input after "-w" is not a + or - symbol
+			recordErrors("Error: Input after '-w' is neither a '+' or '-' symbol.");
 		}
 	}
+	
 	public void changeSpace(int spacing)
 	{
 		space = spacing;
 	}
+	
 	public void toggleTitle()
 	{
 		if(title == false)
@@ -302,37 +336,40 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			title = false;
 		}
 	}
+	
 	public void changeParagraph(int indent)
 	{
 		if(indent == -1)
 		{
-			//error: input after "-p" command is not an integer
+			recordErrors("Error: Input after '-p' is not an integer.");
 		}
 		else
 		{
 			paragraphIndent = indent;
 		}
 	}
+	
 	public void changeBlankLines(int numberOfBlanks)
 	{
 		if(numberOfBlanks == -1)
 		{
-			//error: input after "-b" command is not an integer
+			recordErrors("Error: Input after '-b' is not an integer.");
 		}
 		else
 		{
 			blankLines = numberOfBlanks;
 		}
 	}
+	
 	public void changeColumns(int newColumnNumber)
 	{
 		if(newColumnNumber == -1)
 		{
-			//error: input after "-a" command is not an integer
+			recordErrors("Error: Input after '-a' is not an integer.");
 		}
 		else if(newColumnNumber < 1 || newColumnNumber > 2)
 		{
-			//error: input after "-a" command is invalid you can only have 1 or 2 columns
+			recordErrors("Error: Input after '-a' is not a valid input, you are only allowed to have 1 or 2 columns.");
 		}
 		else
 		{
