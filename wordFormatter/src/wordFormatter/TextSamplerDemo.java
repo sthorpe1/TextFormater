@@ -4,9 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.Scanner;
 import javax.swing.*;
-import javax.swing.text.StyledDocument;
-
-
+import javax.swing.text.*;
 public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -69,13 +67,16 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		bar.add(file);
 		
 		setJMenuBar(bar);
-	
-		//
+		
+		StyleContext context = new StyleContext();
+	    StyledDocument document = new DefaultStyledDocument(context);
+		
+        //
 		text1 = new JTextPane();
 		text1.setEditable(false);
 		text1.setFont(new Font("monospaced", Font.PLAIN, 12));
 		
-		text2 = new JTextPane();
+		text2 = new JTextPane(document);
 		text2.setEditable(false);
 		text2.setFont(new Font("monospaced", Font.PLAIN, 12));
 		//text2.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
@@ -160,6 +161,20 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		    int counter = 0; //used to go to newline after every 80 characters.
 		    int specifiedNum = 0;
 		    
+		    //sets the parameters need to change alignment in the read lines
+		    StyledDocument doc = text2.getStyledDocument();
+		    SimpleAttributeSet left = new SimpleAttributeSet();
+	        StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+
+	        SimpleAttributeSet center = new SimpleAttributeSet();
+	        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+	        
+	        SimpleAttributeSet right = new SimpleAttributeSet();
+	        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+	        
+	        //defaults alignment to left
+	        SimpleAttributeSet tAlignment = left;
+		    
 		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
 		      {
 		        if(currentLine.indexOf("-") == 0)//checks if the line being read is a command
@@ -183,15 +198,15 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		             break;
 		             
 		           case("-l"): //aligns all text after the command to the left side
-		        	   changeAlignment(0);
+		        	   tAlignment = left;
 		             break;
 		             
 		           case("-c"): //aligns all text after the command to the center
-		        	   changeAlignment(1);
+		        	   tAlignment = center;
 		             break;
 		             
 		           case("-r"): //aligns all text after the command to the right side
-		        	   changeAlignment(2);
+		        	   tAlignment = right;
 		             break;
 		             
 		           case("-e"): //equally spaces all words in the line
@@ -271,10 +286,11 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        	//starts a new line at the end of each sentence.
 		        	currentLine = currentLine + "\n";
 		        	counter = 0;
+		    
+		        	doc.setParagraphAttributes(doc.getLength(), 1, tAlignment, false);
+		        	doc.insertString(doc.getLength(), currentLine, tAlignment);
 		        	
-		        	//adds a space if there is an empty line read in the txt file
-		        	StyledDocument doc = text2.getStyledDocument();
-		        	doc.insertString(doc.getLength(), currentLine, null);
+		        	//adds a space if there is an empty line read in the text file
 		        	if(currentLine.equals("")) {
 		        		doc.insertString(doc.getLength(), "\n", null);
 		        	}
@@ -319,11 +335,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		{
 			lineLength = newLength;
 		}
-	}
-	
-	public void changeAlignment(int newAlign)
-	{
-		alignment = newAlign;
 	}
 	
 	public void toggleEqual()
