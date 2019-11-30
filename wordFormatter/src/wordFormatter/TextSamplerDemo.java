@@ -83,7 +83,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 
 		JScrollPane inputScrollPane = new JScrollPane(panelIn);
 		inputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		inputScrollPane.setPreferredSize(new Dimension(250,250));
+		inputScrollPane.setPreferredSize(new Dimension(250,100));
 		inputScrollPane.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Input Text"), 
 				BorderFactory.createEmptyBorder(5,5,5,5)), inputScrollPane.getBorder()));
@@ -269,7 +269,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	//Displays errors to the GUI for user to read
 	public void recordErrors(String errorMsg) {
-		text2.append(errorMsg); 
+		text1.append(errorMsg);
+		text1.setText(null);
 		//There's no area for displaying errors right now, so I'm printing to 2nd area text box for now.
 	}
 	
