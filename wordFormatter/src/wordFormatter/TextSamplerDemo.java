@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.Scanner;
 import javax.swing.*;
+import javax.swing.text.StyledDocument;
 
 
 public class TextSamplerDemo extends JFrame implements ActionListener {
@@ -25,8 +26,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	JPanel panelIn;
 	JPanel panelOut;
-	JTextArea text1;
-	JTextArea text2;
+	JTextPane text1;
+	JTextPane text2;
 	JSplitPane splitPane;
 	
 	public static void main(String[] args){
@@ -51,6 +52,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		JMenuItem save = new JMenuItem("Save");
 		JMenuItem open = new JMenuItem("Open File");
 		JMenuItem saveasFile = new JMenuItem("Save As...");
+		JMenuItem recordErrors = new JMenuItem("Record Errors");
 		
 		//implementing ActionListener to all the item in menu
 		JMenuItem[] items = {newItem, save, open, saveasFile};
@@ -63,14 +65,20 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		file.addSeparator();
 		file.add(save);
 		file.add(saveasFile);
+		file.add(recordErrors);
 		bar.add(file);
 		
 		setJMenuBar(bar);
 	
 		//
-		text1 = new JTextArea();
-		text2 = new JTextArea();
-	
+		text1 = new JTextPane();
+		text1.setEditable(false);
+		text1.setFont(new Font("monospaced", Font.PLAIN, 12));
+		
+		text2 = new JTextPane();
+		text2.setEditable(false);
+		text2.setFont(new Font("monospaced", Font.PLAIN, 12));
+		//text2.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		
 		panelIn = new JPanel();
 		panelIn.setBackground(Color.pink);
@@ -125,6 +133,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			save();
 		} else if (e.getActionCommand().equalsIgnoreCase("Save as")) {
 			saveasFile();
+		} else if (e.getActionCommand().equalsIgnoreCase("Record Errors")) {
+			recordErrors();
 		}
 	
 		
@@ -132,6 +142,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 
 	
 	private void open() {//throws IOException {
+		// resets text so previous file isn't displayed 
+		text2.setText(null);
 		
 		JFileChooser fileChooser = new JFileChooser();
 		
@@ -145,6 +157,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			String currentLine; //current line that the buffered reader is looking at
 		    String command = "";
 		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
+		    int counter = 0; //used to go to newline after every 80 characters.
 		    int specifiedNum = 0;
 		    
 		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
@@ -246,18 +259,35 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        }
 		        else //The only thing that isn't a command is text, any text on this line should be printed on the display after being formatted
 		        {
-		          //Put code to format and display the text in here, use variables to dictate how it should be formatted
+		        	//starts a new line if the current one goes over 75 characters (so that it can finish writing whatever word its on) 
+		        	for(int i = 0; i < currentLine.length(); i++) {
+		        		counter++;
+		        		if(counter >= 75 && i+1 != currentLine.length() && currentLine.substring(i+1, i+2).equals(" ")) {
+		        			currentLine = currentLine.substring(0, i+1) + "\n" + currentLine.substring(i+2,currentLine.length());
+		        			counter = 0;
+		        		}
+		        	}
+		        	
+		        	//starts a new line at the end of each sentence.
+		        	currentLine = currentLine + "\n";
+		        	counter = 0;
+		        	
+		        	//adds a space if there is an empty line read in the txt file
+		        	StyledDocument doc = text2.getStyledDocument();
+		        	doc.insertString(doc.getLength(), currentLine, null);
+		        	if(currentLine.equals("")) {
+		        		doc.insertString(doc.getLength(), "\n", null);
+		        	}
 		        }
 		      }
-			br.close();
-			text1.requestFocus();
+		    br.close();
+			text2.requestFocus();
 			
 		}
 		catch (Exception e)
 		{
 			JOptionPane.showMessageDialog(null, e);
 		}
-		
 	}
 				
 	private void save() {
@@ -266,11 +296,14 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void saveasFile() {
 	
 	}	
+	private void recordErrors() {
+		
+	}	
 	
 	//Displays errors to the GUI for user to read
 	public void recordErrors(String errorMsg) {
 		text1.setText(null);
-		text1.append(errorMsg);
+		text1.setText(errorMsg);
 		//There's no area for displaying errors right now, so I'm printing to 2nd area text box for now.
 	}
 	
