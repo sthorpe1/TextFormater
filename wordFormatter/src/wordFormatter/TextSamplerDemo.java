@@ -269,8 +269,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	//Displays errors to the GUI for user to read
 	public void recordErrors(String errorMsg) {
-		text1.append(errorMsg);
 		text1.setText(null);
+		text1.append(errorMsg);
 		//There's no area for displaying errors right now, so I'm printing to 2nd area text box for now.
 	}
 	
