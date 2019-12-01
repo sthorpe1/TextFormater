@@ -22,6 +22,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	public int paragraphIndent = 0;
 	public int blankLines = 0;
 	public int columnNumber = 1;//this value can only be 1 or 2
+	File selectedFile = null;
 	
 	JPanel panelIn;
 	JPanel panelOut;
@@ -54,7 +55,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		JMenuItem recordErrors = new JMenuItem("Record Errors");
 		
 		//implementing ActionListener to all the item in menu
-		JMenuItem[] items = {newItem, save, open, saveasFile};
+		JMenuItem[] items = {newItem, save, open, saveasFile, recordErrors};
 		for(JMenuItem item : items){
 			item.addActionListener(this);
 		}
@@ -76,6 +77,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		text1 = new JTextPane();
 		text1.setEditable(false);
 		text1.setFont(new Font("monospaced", Font.PLAIN, 12));
+		text1.setBackground(Color.pink);
 		
 		text2 = new JTextPane(document);
 		text2.setEditable(false);
@@ -144,13 +146,21 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 
 	
 	private void open() {//throws IOException {
-		// resets text so previous file isn't displayed 
+		// resets text so previous file and errors aren't displayed 
+		text1.setText(null);
 		text2.setText(null);
 		
 		JFileChooser fileChooser = new JFileChooser();
-		
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		
 		int result = fileChooser.showOpenDialog(null);
+		
+		//If cancel action is detected, this will return and stop open file
+		if(result != JFileChooser.APPROVE_OPTION)
+		{
+			return;
+		}
+		
 		File selectedFile = fileChooser.getSelectedFile();
 		String filename = selectedFile.getAbsolutePath();
 		try{	    
@@ -158,7 +168,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			
 			String currentLine; //current line that the buffered reader is looking at
 		    String command = "";
-		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specify amount or whether to toggle off or on.
+		    String commandDetail = null; //This variable is for commands that expand beyond 2 characters and require a specifier to specify amount or whether to toggle off or on.
 		    int counter = 0; //used to go to newline after every 80 characters.
 		    int specifiedNum = 0;
 		    
@@ -178,7 +188,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		    
 		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
 		      {
-		        if(currentLine.indexOf("-") == 0)//checks if the line being read is a command
+		        if(currentLine.indexOf("-") == 0 && currentLine.length() > 1)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
 		          commandDetail = currentLine.substring(2,currentLine.length());
@@ -199,35 +209,105 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		             break;
 		             
 		           case("-l"): //aligns all text after the command to the left side
-		        	   tAlignment = left;
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   tAlignment = left;
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-l' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-c"): //aligns all text after the command to the center
-		        	   tAlignment = center;
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   tAlignment = center;
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-c' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-r"): //aligns all text after the command to the right side
-		        	   tAlignment = right;
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   tAlignment = right;
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-r' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-e"): //equally spaces all words in the line
-		        	   toggleEqual();
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   toggleEqual();
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-e' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-w"): //toggles wrap
-		        	   toggleWrap(commandDetail);
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == "+" || commandDetail == "-")
+		        	   {
+		        		   toggleWrap(commandDetail);
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-w+' or '-w-' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-s"): //single spacing
-		        	   changeSpace(0);
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   changeSpace(0);
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-s' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-d"): //double spacing
-		        	   changeSpace(1);
+		        	   
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   changeSpace(1);
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-d' command, additional input is not necessary");
+		        	   }
 		             break;
 		             
 		           case("-t"): //text after this command becomes a title by printing the text on one line and then printing hyphens underneath the text on a second line
-		              toggleTitle();
+		        	   //Error handling for when additional input values are entered after commands that don't need it
+		        	   if(commandDetail == null)
+		        	   {
+		        		   toggleTitle();
+		        	   }
+		        	   else
+		        	   {
+		        		   recordErrors("Error: Unexpected input after '-t' command, additional input is not necessary");
+		        	   }
 		        	   break;
 		        	   
 		           //Parses user input for numerical value to pass a number of spaces to indent, includes
@@ -273,7 +353,15 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        	   recordErrors("Error: Input after '-' is not a valid command.");
 		          }
 		        }
-		        else //The only thing that isn't a command is text, any text on this line should be printed on the display after being formatted
+		        
+		        //This else if statement is error handling for when a hyphen is given as an input alone.
+		        else if(currentLine.indexOf("-") == 0 && currentLine.length() == 1)
+		        {
+		        	recordErrors("Error: Invalid command, expected additional input after '-'.");
+		        }
+		        
+		        //The only thing that isn't a command is text, any text on currentLine should be printed on the display after being formatted
+		        else
 		        {
 		        	//starts a new line if the current one goes over 75 characters (so that it can finish writing whatever word its on) 
 		        	for(int i = 0; i < currentLine.length(); i++) {
@@ -308,11 +396,35 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	}
 				
 	private void save() {
+		//Returns
+		if(selectedFile == null)
+		{
+			recordErrors("Error: Unable to save, pre-existing save file must be created.");
+			return;
+		}
 		
-	}
-	public void saveasFile() {
+		//Adds .txt to file if it doesn't already have it
+		if(!selectedFile.getName().endsWith(".txt"))
+		{
+			selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
+		}
+		PrintWriter sWriter = null;
+		
+		//Saves all text from text2 into the file desired.
+		try {
+			sWriter = new PrintWriter(new FileWriter(selectedFile));
+			sWriter.write(text2.getText());	//******This will definitely need to be changed later, this doesn't print with formatting******
+			sWriter.close();
+		}	catch (IOException error) {
+			recordErrors("Error: Unable to save file.");
+			error.printStackTrace();	//Prints where the error occurred and what type of error in console
+		}
+	}	
+
+	private void saveasFile() {
 		//Only allows user to select existing text files or to make a new text file by inputting a name
 		FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter("Text File", "txt");
+		
 		//Upon pressing save as, user is directed to the file path of the program
 		JFileChooser fc = new JFileChooser("./");
 		fc.setApproveButtonText("Save");
@@ -329,32 +441,65 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		
 		//Grabs all the necessary information to save and ensures that the output
 		//file will always be a text file.
-		File selectedFile = fc.getSelectedFile();
+		selectedFile = fc.getSelectedFile();
 		if(!selectedFile.getName().endsWith(".txt"))
 		{
 			selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
 		}
-		PrintWriter writer = null;
+		PrintWriter saWriter = null;
 		
 		//Saves all text from text2 into the file desired.
 		try {
-			writer = new PrintWriter(new FileWriter(selectedFile));
-			writer.write(text2.getText());	//******This will definitely need to be changed later, this doesn't print with formatting******
-			writer.close();
+			saWriter = new PrintWriter(new FileWriter(selectedFile));
+			saWriter.write(text2.getText());	//******This will definitely need to be changed later, this doesn't print with formatting******
+			saWriter.close();
 		}	catch (IOException error) {
 			recordErrors("Error: Unable to save file.");
 			error.printStackTrace();	//Prints where the error occurred and what type of error in console
 		}
 	}	
+	
 	private void recordErrors() {
+		//Only allows user to select existing text files or to make a new text file by inputting a name
+		FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter("Text File", "txt");
 		
+		//Upon pressing save as, user is directed to the file path of the program
+		JFileChooser fc = new JFileChooser("./");
+		fc.setApproveButtonText("Save");
+		fc.setFileFilter(extensionFilter);
+		
+		//Detects whether or not the user pressed cancel and ensures program doesn't 
+		//continue to attempt to save by returning when a cancel action is detected
+		int action = fc.showOpenDialog(this);
+		
+		if (action != JFileChooser.APPROVE_OPTION)
+		{
+			return;
+		}
+		
+		//Grabs all the necessary information to save and ensures that the output
+		//file will always be a text file.
+		File errorFile = fc.getSelectedFile();
+		if(!errorFile.getName().endsWith(".txt"))
+		{
+			errorFile = new File(errorFile.getAbsolutePath() + ".txt");
+		}
+		PrintWriter errWriter = null;
+		
+		//Saves all text from text2 into the file desired.
+		try {
+			errWriter = new PrintWriter(new FileWriter(errorFile));
+			errWriter.write(text1.getText());
+			errWriter.close();
+		}	catch (IOException error) {
+			recordErrors("Error: Unable to record errors to file.");
+			error.printStackTrace();	//Prints where the error occurred and what type of error in console
+		}
 	}	
 	
 	//Displays errors to the GUI for user to read
 	public void recordErrors(String errorMsg) {
-		text1.setText(null);
-		text1.setText(errorMsg);
-		//There's no area for displaying errors right now, so I'm printing to 2nd area text box for now.
+		text1.setText(text1.getText() + errorMsg + "\n");
 	}
 	
 	//All functions below here change the variables that are declared above
