@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.text.*;
+import javax.swing.filechooser.*;
 public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -132,7 +133,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 						
 		} else if (e.getActionCommand().equalsIgnoreCase("Save")) {
 			save();
-		} else if (e.getActionCommand().equalsIgnoreCase("Save as")) {
+		} else if (e.getActionCommand().equalsIgnoreCase("Save as...")) {
 			saveasFile();
 		} else if (e.getActionCommand().equalsIgnoreCase("Record Errors")) {
 			recordErrors();
@@ -157,7 +158,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			
 			String currentLine; //current line that the buffered reader is looking at
 		    String command = "";
-		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specificy amount or whether to toggle off or on.
+		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specify amount or whether to toggle off or on.
 		    int counter = 0; //used to go to newline after every 80 characters.
 		    int specifiedNum = 0;
 		    
@@ -309,8 +310,41 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	private void save() {
 		
 	}
-	private void saveasFile() {
-	
+	public void saveasFile() {
+		//Only allows user to select existing text files or to make a new text file by inputting a name
+		FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter("Text File", "txt");
+		//Upon pressing save as, user is directed to the file path of the program
+		JFileChooser fc = new JFileChooser("./");
+		fc.setApproveButtonText("Save");
+		fc.setFileFilter(extensionFilter);
+		
+		//Detects whether or not the user pressed cancel and ensures program doesn't 
+		//continue to attempt to save by returning when a cancel action is detected
+		int action = fc.showOpenDialog(this);
+		
+		if (action != JFileChooser.APPROVE_OPTION)
+		{
+			return;
+		}
+		
+		//Grabs all the necessary information to save and ensures that the output
+		//file will always be a text file.
+		File selectedFile = fc.getSelectedFile();
+		if(!selectedFile.getName().endsWith(".txt"))
+		{
+			selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
+		}
+		PrintWriter writer = null;
+		
+		//Saves all text from text2 into the file desired.
+		try {
+			writer = new PrintWriter(new FileWriter(selectedFile));
+			writer.write(text2.getText());	//******This will definitely need to be changed later, this doesn't print with formatting******
+			writer.close();
+		}	catch (IOException error) {
+			recordErrors("Error: Unable to save file.");
+			error.printStackTrace();	//Prints where the error occurred and what type of error in console
+		}
 	}	
 	private void recordErrors() {
 		
