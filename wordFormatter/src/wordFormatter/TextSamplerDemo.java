@@ -191,7 +191,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        if(currentLine.indexOf("-") == 0 && currentLine.length() > 1)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
-		          commandDetail = currentLine.substring(3,currentLine.length());
+		          commandDetail = currentLine.substring(2,currentLine.length());
 		          
 		          switch(command) //Dictates based on command read which variables to change by calling functions to change variables
 		          {
