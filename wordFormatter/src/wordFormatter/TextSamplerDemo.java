@@ -191,7 +191,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        if(currentLine.indexOf("-") == 0 && currentLine.length() > 1)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
-		          commandDetail = currentLine.substring(2,currentLine.length());
+		          commandDetail = currentLine.substring(3,currentLine.length());
 		          
 		          switch(command) //Dictates based on command read which variables to change by calling functions to change variables
 		          {
@@ -338,6 +338,11 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           			specifiedNum = -1;
 		           		};
 		           		changeBlankLines(specifiedNum);
+		           		if(specifiedNum != -1) {
+		           			for(int i = 0; i < specifiedNum; i++) {
+		           				doc.insertString(doc.getLength(), "\n", null);
+		           			}
+		           		}
 		             break;
 		             
 		           //Parses user input for numerical value to pass a number of columns, includes
