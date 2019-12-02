@@ -168,7 +168,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			
 			String currentLine; //current line that the buffered reader is looking at
 		    String command = "";
-		    String commandDetail = null; //This variable is for commands that expand beyond 2 characters and require a specifier to specify amount or whether to toggle off or on.
+		    String commandDetail = ""; //This variable is for commands that expand beyond 2 characters and require a specifier to specify amount or whether to toggle off or on.
 		    int counter = 0; //used to go to newline after every 80 characters.
 		    int specifiedNum = 0;
 		    
@@ -211,7 +211,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-l"): //aligns all text after the command to the left side
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   tAlignment = left;
 		        	   }
@@ -224,7 +224,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-c"): //aligns all text after the command to the center
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   tAlignment = center;
 		        	   }
@@ -237,7 +237,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-r"): //aligns all text after the command to the right side
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   tAlignment = right;
 		        	   }
@@ -249,7 +249,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		             
 		           case("-e"): //equally spaces all words in the line
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   toggleEqual();
 		        	   }
@@ -262,9 +262,13 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-w"): //toggles wrap
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == "+" || commandDetail == "-")
+		        	   if(currentLine.length() == 3)
 		        	   {
 		        		   toggleWrap(commandDetail);
+		        	   }
+		        	   else if(currentLine.length() == 2)
+		        	   {
+		        		   recordErrors("Error: Expected input after '-w+' or '-w-' command, additional input is necessary");
 		        	   }
 		        	   else
 		        	   {
@@ -275,7 +279,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-s"): //single spacing
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   changeSpace(0);
 		        	   }
@@ -288,7 +292,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           case("-d"): //double spacing
 		        	   
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   changeSpace(1);
 		        	   }
@@ -300,7 +304,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		             
 		           case("-t"): //text after this command becomes a title by printing the text on one line and then printing hyphens underneath the text on a second line
 		        	   //Error handling for when additional input values are entered after commands that don't need it
-		        	   if(commandDetail == null)
+		        	   if(currentLine.length() == 2)
 		        	   {
 		        		   toggleTitle();
 		        	   }
@@ -530,11 +534,11 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	public void toggleWrap(String toggler)
 	{
-		if(toggler == "+")
+		if(toggler.equalsIgnoreCase("+"))
 		{
 			wrap = true;
 		}
-		else if(toggler == "-")
+		else if(toggler.equalsIgnoreCase("-"))
 		{
 			wrap = false;
 		}
