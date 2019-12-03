@@ -39,7 +39,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	}
 	
 	public TextSamplerDemo() {
-		super("Text Format Demo");
+		super("Text Parser");
 		setSize(800,800);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
@@ -100,7 +100,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		inputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		inputScrollPane.setPreferredSize(new Dimension(250,100));
 		inputScrollPane.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Input Text"), 
+				BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Error Text"), 
 				BorderFactory.createEmptyBorder(5,5,5,5)), inputScrollPane.getBorder()));
 		inputScrollPane.setMinimumSize(new Dimension(10,10));
 		
@@ -198,12 +198,12 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		    
 		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
 		      {
-		    	  if ( currentLine.trim().length() == 0) {//remove blank lines
+		    	 wrapCounter++; //counts the amount of times that currentLine has read a new line
+		    	 if ( currentLine.trim().length() == 0) {//remove blank lines
 		    		  
-		    		  		continue;
-		    	  }
+		    		  	continue;
+		    	 }
 		    	  
-		    	wrapCounter++;
 		        if(currentLine.indexOf("-") == 0 && currentLine.length() > 1)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
@@ -394,6 +394,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        	int currentLength = currentLine.length();
 		        	int numOfSpaces = currentLineWords.length - 1;
 		        	int leftOverSpace = lineLength - currentLength;
+		        	boolean specialAlignCase = false;
 		        	
 		        	//Checks if wrap was used in previous lines and removes any words
 		        	//that were added to the last line from current line.
@@ -424,13 +425,15 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        		wrapUsed = false;
 		        	}
 		        	
-		        	//Checks if user gave an empty file or a file with only one line
-		        	//to avoid Null Pointer error
+		        	//For loop that will set nextLine as the next line of currentLine
 		        	for(int newWrapCount = currentWrapCount; newWrapCount < wrapCounter; newWrapCount++)
 		        	{
 		        		if((nextLine = nextLineReader.readLine()) != null);
 		        		currentWrapCount++;
 		        	}
+		        	
+		        	//Checks if user gave an empty file or a file with only one line
+		        	//to avoid Null Pointer error
 		        	if(nextLine != null)
 		        	{
 		        		//Iterates through text file until nextLine becomes a line of text
@@ -524,58 +527,123 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	        		//the text of currentLine and reset paragraphIndent after finished.
 	        		if(paragraphIndent > 0)
 	        		{
+	        			//Stops program from indenting if text is right aligned
+	        			if(tAlignment == right)
+	        			{
+	        				recordErrors("Error: Unable to indent text when text is aligned to the right.");
+	        				paragraphIndent = 0;
+	        			}
+	        			//Indents the text
 	        			for(int indents = 0; indents < paragraphIndent; indents++)
 	        			{
 	        				currentLine = " " + currentLine;
 	        			}
 	        			paragraphIndent = 0;
 	        		}
-	        		
-	        		//Checks if there is any content to align
-	        		if(!currentLine.equals(""))
-	        		{
-	        			if(tAlignment == right)
-		        		{
-		        			//Adds spaces to the left of the text to right align
-		        			for(int rightSpace = 0; rightSpace < leftOverSpace; rightSpace++)
-		        			{
-		        				currentLine = " " + currentLine;
-		        			}
-		        		}
-		        		else if(tAlignment == center)
-		        		{
-		        			//Equally spaces both sides of the text to center align
-		        			for(int centerSpace = 0; centerSpace < leftOverSpace - 1; centerSpace += 2)
-		        			{
-		        				currentLine = " " + currentLine + " ";
-		        			}
-		        		}
-		        		else if(tAlignment == left && wrap == false)
-			        	{
-			        		//Adds spaces to the right of the text to left align
-		        			for(int rightSpace = 0; rightSpace < leftOverSpace; rightSpace++)
-		        			{
-		        				currentLine = currentLine + " ";
-		        			}
-			        	}
-	        		}
-	        		
+
 	        		//Puts words that would make the line length go over the lineLength limit onto the next line
 		        	String lastWords = "";
+		        	int tempLen = currentLength;
 		        	if(currentLength > lineLength)
 		        	{
 		        		for(int i = 1; i < currentLineWords.length; i++)
 			        	{
-			        		int tempLen = currentLength;
 			        		lastWords = currentLineWords[currentLineWords.length - i];
 			        		tempLen -= lastWords.length() + 1;
+			        		
 			        		if(tempLen < lineLength)
 			        		{
-			        			currentLine = currentLine.substring(0, tempLen) + "\n" + currentLine.substring(tempLen, currentLength);
+			        			currentLine = currentLine.substring(0, tempLen) + "\n" + currentLine.substring(tempLen + 1, currentLength);
+			        			specialAlignCase = true;
 			        			break;
 			        		}
 			        	}
 		        	}
+		        	
+		        	//Checks if there is any content to align
+	        		if(!currentLine.equals(""))
+	        		{
+	        			//Checks if another method has put text into the next line of currentLine and aligns that text
+	        			if(specialAlignCase == true)
+	        			{
+	        				//Variables defining amount of spaces needed for the first line of currentline and the second line of currentline
+	        				leftOverSpace = lineLength - (currentLength - currentLine.substring(0, tempLen).length() - 1);
+	        				int firstLineSpace = lineLength - currentLine.substring(0, tempLen).length();
+
+	        				if(tAlignment == right)
+			        		{
+			        			//Adds spaces to the left of the text that was moved to the next line to right align
+			        			for(int leftSpace = 0; leftSpace < leftOverSpace; leftSpace++)
+			        			{
+			        				currentLine = currentLine.substring(0, tempLen + leftSpace + 1) + " " + currentLine.substring(tempLen + leftSpace + 1, currentLength + leftSpace);
+			        			}
+			        			
+			        			//Adds spaces to the left of the text to right align first line
+			        			for(int leftSpace = 0; leftSpace < firstLineSpace; leftSpace++)
+			        			{
+			        				currentLine = " " + currentLine;
+			        			}
+			        		}
+			        		else if(tAlignment == center)
+			        		{
+			        			//Adds spaces to the left of the text that was moved to the next line to right align
+			        			for(int centerSpace = 0; centerSpace < leftOverSpace; centerSpace++)
+			        			{
+			        				currentLine = currentLine.substring(0, tempLen + centerSpace + 1) + " " + currentLine.substring(tempLen + centerSpace + 1, currentLength + centerSpace) + " ";
+			        			}
+			        			
+			        			//Equally spaces both sides of the text to center align
+			        			for(int centerSpace = 0; centerSpace < firstLineSpace - 1; centerSpace += 2)
+			        			{
+			        				currentLine = " " + currentLine + " ";
+			        			}
+			        		}
+			        		else if(tAlignment == left && wrap == false)
+				        	{
+			        			//Adds spaces to the left of the text that was moved to the next line to right align
+			        			for(int rightSpace = 0; rightSpace < leftOverSpace; rightSpace++)
+			        			{
+			        				currentLine = currentLine + " ";
+			        			}
+			        			
+				        		//Adds spaces to the right of the text to left align
+			        			for(int rightSpace = 0; rightSpace < firstLineSpace; rightSpace++)
+			        			{
+			        				currentLine = currentLine.substring(0, tempLen + rightSpace) + " " + currentLine.substring(tempLen + rightSpace, currentLength + leftOverSpace + rightSpace);
+			        			}
+				        	}
+	        			}
+	        			//If there is only one line of text in currentline then 
+	        			//program will align normally
+	        			else
+	        			{
+	        				if(tAlignment == right)
+			        		{
+			        			//Adds spaces to the left of the text to right align
+			        			for(int leftSpace = 0; leftSpace < leftOverSpace; leftSpace++)
+			        			{
+			        				currentLine = " " + currentLine;
+			        				
+			        			}
+			        		}
+			        		else if(tAlignment == center)
+			        		{
+			        			//Equally spaces both sides of the text to center align
+			        			for(int centerSpace = 0; centerSpace < leftOverSpace - 1; centerSpace += 2)
+			        			{
+			        				currentLine = " " + currentLine + " ";
+			        			}
+			        		}
+			        		else if(tAlignment == left && wrap == false)
+				        	{
+				        		//Adds spaces to the right of the text to left align
+			        			for(int rightSpace = 0; rightSpace < leftOverSpace; rightSpace++)
+			        			{
+			        				currentLine = currentLine + " ";
+			        			}
+				        	}
+	        			}
+	        		}
 		        	
 		        	//Inserts words from next line to be read to the current line being read
 		        	if(wrap == true && nextLine != null)
@@ -612,7 +680,18 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 				        currentLine = currentLine + "\n";
 		        	}
 		        	
+		        	//Adds spacing to text based on user input
+		        	if(space == 0 && !currentLine.equals(""))
+		        	{
+		        		currentLine = currentLine + "\n";
+		        	}
+		        	else if(space == 1 && !currentLine.equals(""))
+		        	{
+		        		currentLine = currentLine + "\n" + "\n";
+		        	}
+		        	
 		        	doc.insertString(doc.getLength(), currentLine, null);
+		        	
 		        }
 		      }
 		    nextLineReader.close();
@@ -782,24 +861,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	public void changeSpace(int spacing)
 	{
 		space = spacing;
-		if(space == 0) 
-		{//single space
-			text2.selectAll();
-			MutableAttributeSet set = new SimpleAttributeSet();
-			StyleConstants.setLineSpacing(set, 1);	
-			text2.setParagraphAttributes(set, true);
-
-			text2.setCaretPosition(0);//scroll back to the top
-
-		}else if(space == 1) 
-		{//double space
-			text2.selectAll();
-			MutableAttributeSet set = new SimpleAttributeSet();
-			StyleConstants.setLineSpacing(set, 2);
-			text2.setParagraphAttributes(set, true);
-
-			text2.setCaretPosition(0);
-		}
 	}
 	
 	
