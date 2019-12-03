@@ -6,6 +6,9 @@ import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.filechooser.*;
+
+
+
 public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -29,6 +32,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	JTextPane text1;
 	JTextPane text2;
 	JSplitPane splitPane;
+	String text = "";
 	
 	public static void main(String[] args){
 		
@@ -72,7 +76,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		
 		StyleContext context = new StyleContext();
 	    StyledDocument document = new DefaultStyledDocument(context);
-		
+	    
         //
 		text1 = new JTextPane();
 		text1.setEditable(false);
@@ -117,6 +121,8 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		splitPane.setBottomComponent(outputScrollPane);
 		
 		add(splitPane);
+		
+		
 	}
 
 
@@ -163,8 +169,23 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		
 		File selectedFile = fileChooser.getSelectedFile();
 		String filename = selectedFile.getAbsolutePath();
+		
 		try{	    
-			BufferedReader br = new BufferedReader(new FileReader(filename));
+			BufferedReader br = new BufferedReader(new FileReader(filename));		
+			text1.read(br, null);
+			
+			br.close();
+			text1.requestFocus();
+			
+			}
+			catch (Exception e)
+			{
+				JOptionPane.showMessageDialog(null, e);
+			}
+		
+		
+		try{	    
+			BufferedReader br = new BufferedReader(new FileReader(filename));		
 			
 			String currentLine; //current line that the buffered reader is looking at
 		    String command = "";
@@ -186,8 +207,12 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	        //defaults alignment to left
 	        SimpleAttributeSet tAlignment = left;
 		    
-		      while((currentLine = br.readLine()) != null) //continues reading text file until there is nothing left to be read
+		      while((currentLine = br.readLine()) != null )//continues reading text file until there is nothing left to be read
 		      {
+		    	  if ( currentLine.trim().length() == 0 ) {//remove blank lines
+		    		    continue; 
+		    	  }
+
 		        if(currentLine.indexOf("-") == 0 && currentLine.length() > 1)//checks if the line being read is a command
 		        {
 		          command = currentLine.substring(0,2);
@@ -338,11 +363,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		           			specifiedNum = -1;
 		           		};
 		           		changeBlankLines(specifiedNum);
-		           		if(specifiedNum != -1) {
-		           			for(int i = 0; i < specifiedNum; i++) {
-		           				doc.insertString(doc.getLength(), "\n", null);
-		           			}
-		           		}
 		             break;
 		             
 		           //Parses user input for numerical value to pass a number of columns, includes
@@ -539,9 +559,13 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	
 	public void toggleWrap(String toggler)
 	{
+		
 		if(toggler.equalsIgnoreCase("+"))
 		{
 			wrap = true;
+			
+		   
+		    
 		}
 		else if(toggler.equalsIgnoreCase("-"))
 		{
@@ -556,7 +580,26 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	public void changeSpace(int spacing)
 	{
 		space = spacing;
+		if(space == 0) 
+		{//single space
+			text2.selectAll();
+			MutableAttributeSet set = new SimpleAttributeSet();
+			StyleConstants.setLineSpacing(set, 1);	
+			text2.setParagraphAttributes(set, true);
+			
+			text2.setCaretPosition(0);//scroll back to the top
+			
+		}else if(space == 1) 
+		{//double space
+			text2.selectAll();
+			MutableAttributeSet set = new SimpleAttributeSet();
+			StyleConstants.setLineSpacing(set, 2);
+			text2.setParagraphAttributes(set, true);
+			
+			text2.setCaretPosition(0);
+		}
 	}
+	
 	
 	public void toggleTitle()
 	{
@@ -609,4 +652,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			columnNumber = newColumnNumber;
 		}
 	}
+	
+	
 }
