@@ -470,7 +470,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	        				{
 	        					currentWord = currentLineWords[j];
 	        					lastIndexCounter += currentWord.length() + spacesAdded + 1;
-	        					
 	        					//Adds spaces in between words
 	        					for(spacesAdded = 0; spacesAdded < amountOfSpaces; spacesAdded++)
 	        					{
@@ -483,7 +482,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	        			{
 	        				recordErrors("Error: To equally space words you need more than 2 words.");
 	        			}
-	        			equalSpace = false;	//Resets the boolean since the -e command isn't a toggle command
 	        		}
 	        		
 	        		//Changes the currentLine to be the title by centering the text and underlining it with hyphens
@@ -520,7 +518,6 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 	        				recordErrors("Error: Unable to indent title, this is not a valid command combination.");
 	        			}
 	        			
-	        			title = false;
 	        		}
 	        		
 	        		//Indents the currentLine by adding a user inputed amount of spaces in front of
@@ -553,7 +550,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			        		
 			        		if(tempLen < lineLength)
 			        		{
-			        			currentLine = currentLine.substring(0, tempLen) + "\n" + currentLine.substring(tempLen + 1, currentLength);
+			        			currentLine = currentLine.substring(0, tempLen) + "\n" + currentLine.substring(tempLen, currentLine.length());
 			        			specialAlignCase = true;
 			        			break;
 			        		}
@@ -561,7 +558,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        	}
 		        	
 		        	//Checks if there is any content to align
-	        		if(!currentLine.equals(""))
+	        		if(!currentLine.equals("") && equalSpace == false && title == false)
 	        		{
 	        			//Checks if another method has put text into the next line of currentLine and aligns that text
 	        			if(specialAlignCase == true)
@@ -587,15 +584,14 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 			        		else if(tAlignment == center)
 			        		{
 			        			//Adds spaces to the left of the text that was moved to the next line to right align
-			        			for(int centerSpace = 0; centerSpace < leftOverSpace; centerSpace++)
+			        			for(int centerSpace = 0; centerSpace < leftOverSpace/2; centerSpace++)
 			        			{
-			        				currentLine = currentLine.substring(0, tempLen + centerSpace + 1) + " " + currentLine.substring(tempLen + centerSpace + 1, currentLength + centerSpace) + " ";
+			        				currentLine = currentLine.substring(0, tempLen + centerSpace + 1) + " " + currentLine.substring(tempLen + centerSpace + 1, currentLine.length()) + " ";
 			        			}
-			        			
 			        			//Equally spaces both sides of the text to center align
-			        			for(int centerSpace = 0; centerSpace < firstLineSpace - 1; centerSpace += 2)
+			        			for(int centerSpace = 0; centerSpace < firstLineSpace/2; centerSpace++)
 			        			{
-			        				currentLine = " " + currentLine + " ";
+			        				currentLine = " " + currentLine.substring(0, tempLen + centerSpace) + " " + currentLine.substring(tempLen + centerSpace, currentLine.length());
 			        			}
 			        		}
 			        		else if(tAlignment == left && wrap == false)
@@ -644,7 +640,7 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 				        	}
 	        			}
 	        		}
-		        	
+	        		
 		        	//Inserts words from next line to be read to the current line being read
 		        	if(wrap == true && nextLine != null)
 		        	{
@@ -678,17 +674,16 @@ public class TextSamplerDemo extends JFrame implements ActionListener {
 		        	{
 		        		//starts a new line at the end of each sentence.
 				        currentLine = currentLine + "\n";
+				        
+				        //Adds spacing to text based on user input
+				        if(space == 1)
+				        {
+				        	currentLine = currentLine + "\n";
+				        }
 		        	}
 		        	
-		        	//Adds spacing to text based on user input
-		        	if(space == 0 && !currentLine.equals(""))
-		        	{
-		        		currentLine = currentLine + "\n";
-		        	}
-		        	else if(space == 1 && !currentLine.equals(""))
-		        	{
-		        		currentLine = currentLine + "\n" + "\n";
-		        	}
+		        	equalSpace = false;	//Resets the boolean since the -e command isn't a toggle command
+		        	title = false;	//Resets the boolean since -t command isn't a toggle command
 		        	
 		        	doc.insertString(doc.getLength(), currentLine, null);
 		        	
